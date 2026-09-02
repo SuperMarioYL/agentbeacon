@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "name": "agentbeacon",
+  "github": "https://github.com/SuperMarioYL/agentbeacon",
+  "host": "agentbeacon.lei6393.com",
+  "lang": { "primary": "zh", "toggle": true },
+  "accent": ["#e0a82e"],
+  "hero": {
+    "eyebrow": { "zh": "完成即推送 · 失控即提醒 · 守住额度", "en": "Pings on done · Alerts on loop · Saves your cap" },
+    "headline": {
+      "zh": "agent 一完成就推给你,\n失控循环烧掉额度前,先提醒你",
+      "en": "The instant your agent finishes, it pings you\nBefore a runaway loop burns your cap, it warns you"
+    },
+    "sub": {
+      "zh": "它在浏览器里守着你那些跑很久的 agent,一完成、或开始重复打转,就把信号推到你真正在用的 IM;跑过你设的时限,还会再提醒你一次。",
+      "en": "It keeps watch over your long-running agent from inside the browser, and the instant it finishes — or starts repeating itself in a loop — pushes the signal to the IM you actually live in, pinging you again if a run drags past the limit you set."
+    },
+    "ctaGithub": { "zh": "在 GitHub 查看", "en": "View on GitHub" }
+  },
+  "advantages": [
+    {
+      "title": { "zh": "一结束,消息就到了", "en": "The second it ends, the message lands" },
+      "body": {
+        "zh": "跑很久的 agent 终于结束时,一条消息带着耗时和简短摘要直接落到你的 IM——不用再开着标签页来回刷,也不会错过它完成的那一刻。",
+        "en": "When a long run finally finishes, a message with the time it took and a short summary drops straight into your IM — no more propping a tab open and refreshing, and no missing the moment it's done."
+      },
+      "chips": [
+        "› 完成即推送",
+        "› 带耗时与摘要"
+      ]
+    },
+    {
+      "title": { "zh": "开始打转,先提醒你", "en": "It starts looping — you hear it first" },
+      "body": {
+        "zh": "当同一段话在多轮之间反复出现、agent 像在原地打转,一条提醒先于额度被烧光到你手里——还带你回到那个标签页,停不停由你决定。",
+        "en": "When the same reply starts repeating across turns and the agent looks stuck in a circle, a warning reaches you before the cap gets burned down — with a link back to that tab, so you decide whether to stop it."
+      },
+      "chips": [
+        "› 重复即提醒",
+        "› 一键回到标签页",
+        "› 提示,非保证"
+      ]
+    },
+    {
+      "title": { "zh": "跑太久,会有人喊你", "en": "Run too long, and it speaks up" },
+      "body": {
+        "zh": "有些任务会一直跑下去不收尾。你设一个时限,只要浏览器还开着,一旦超过就有一条提醒到你 IM——不用一直盯着,也不会一回神才发现整周额度早被烧光。",
+        "en": "Some runs just keep going without ending. Set a limit, and as long as your browser stays open, the moment a run crosses it a reminder hits your IM — no need to keep watching, so you don't come back to find the week's allowance already burned through."
+      },
+      "chips": [
+        "› 自设时限",
+        "› 超时即提醒"
+      ]
+    },
+    {
+      "title": { "zh": "推到你真正在用的 IM", "en": "Pushed to the IM you actually live in" },
+      "body": {
+        "zh": "信号直达微信、钉钉、飞书——你不用再为收个通知去装新 App 或守着电脑。整个东西跑在你自己的浏览器里,没有后端;黏贴一个 webhook 地址,发条测试消息就知道通了。",
+        "en": "Signals land in WeChat, DingTalk and Feishu — no new app to install, no sitting at the computer. The whole thing runs inside your own browser with no backend; paste a webhook address, send a test message, and you know it's wired up."
+      },
+      "chips": [
+        "› 微信 / 钉钉 / 飞书",
+        "› 无后端 · 浏览器内运行",
+        "› 测试 ping 验证"
+      ]
+    }
+  ],
+  "scene": {
+    "kind": "hub-nodes",
+    "nodes": ["微信", "钉钉", "飞书"]
+  },
+  "cta": {
+    "headline": {
+      "zh": "让整夜狂转的 agent,不再烧光你的额度",
+      "en": "Stop an overnight loop from burning your cap"
+    },
+    "sub": {
+      "zh": "开源、MIT,加载进浏览器即用——黏贴一个推送地址,发条测试消息,下一次 agent 完成时你就会在 IM 里看到它。",
+      "en": "Open source, MIT, ready the moment you load it into your browser — paste a push address, send a test message, and the next time your agent finishes you'll see it in your IM."
+    },
+    "button": { "zh": "在 GitHub 查看", "en": "View on GitHub" }
+  },
+  "footer": {
+    "tag": {
+      "zh": "开源 · MIT · 浏览器里的 agent 信号灯塔",
+      "en": "Open source · MIT · the in-browser beacon for your agent runs"
+    }
+  }
+}
