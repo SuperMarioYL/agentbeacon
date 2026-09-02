@@ -1,0 +1,27 @@
+{
+  "name": "agentbeacon",
+  "version": "0.1.0",
+  "description": "MV3 extension that detects ChatGPT agent completion + runaway loops and pushes signals to 微信/钉钉/飞书 IM bots, with a usage-cap tripwire.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.7.1",
+    "@types/chrome": "^0.2.8",
+    "@types/node": "^22.10.0",
+    "jsdom": "^30.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}

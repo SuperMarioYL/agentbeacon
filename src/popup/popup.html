@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>AgentBeacon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <header class="hdr">
+      <h1>AgentBeacon</h1>
+      <p class="tag">agent 完成与循环信号 → 微信 / 钉钉 / 飞书</p>
+    </header>
+
+    <form id="config-form" class="cfg">
+      <fieldset>
+        <legend>飞书 Feishu</legend>
+        <label class="row"
+          >Webhook URL
+          <input
+            id="feishu-url"
+            type="url"
+            placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/…"
+        /></label>
+        <label class="row"
+          >签名 Secret
+          <input id="feishu-secret" type="password" placeholder="可选" />
+        </label>
+        <label class="chk"
+          ><input id="feishu-enabled" type="checkbox" /> 启用</label
+        >
+      </fieldset>
+
+      <fieldset>
+        <legend>钉钉 DingTalk</legend>
+        <label class="row"
+          >Webhook URL
+          <input
+            id="dingtalk-url"
+            type="url"
+            placeholder="https://oapi.dingtalk.com/robot/send?access_token=…"
+        /></label>
+        <label class="row"
+          >加签 Secret
+          <input id="dingtalk-secret" type="password" placeholder="可选" />
+        </label>
+        <label class="chk"
+          ><input id="dingtalk-enabled" type="checkbox" /> 启用</label
+        >
+      </fieldset>
+
+      <fieldset>
+        <legend>企业微信 WeCom</legend>
+        <label class="row"
+          >Webhook URL
+          <input
+            id="wework-url"
+            type="url"
+            placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=…"
+        /></label>
+        <label class="chk"
+          ><input id="wework-enabled" type="checkbox" /> 启用</label
+        >
+      </fieldset>
+
+      <fieldset>
+        <legend>阈值</legend>
+        <label class="row"
+          >用量上限提醒（分钟）
+          <input id="cap-threshold" type="number" min="0" step="5" />
+        </label>
+        <label class="row"
+          >循环空闲阈值（分钟）
+          <input id="loop-threshold" type="number" min="0" step="1" />
+        </label>
+        <label class="row"
+          >循环最小轮数
+          <input id="loop-turn-delta" type="number" min="1" step="1" />
+        </label>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="primary">保存</button>
+        <button type="button" id="test">发送测试 ping</button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </form>
+
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>

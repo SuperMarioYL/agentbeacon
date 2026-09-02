@@ -1,0 +1,27 @@
+name: release
+on:
+  push:
+    tags: ["v*.*.*"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Stage release artifacts
+        run: |
+          mkdir -p release
+          (cd dist && zip -r ../release/agentbeacon-chromium.zip .)
+          (cd release && sha256sum agentbeacon-chromium.zip > checksums.txt)
+          cat release/checksums.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: release/*

@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# typecheck cache
+*.tsbuildinfo
+
+# local secrets — never commit real webhook URLs
+.env
+.env.local
+
+# build scratch (internal scaffolding, not product files)
+BUILD_SETUP_NEXT_STEPS.md
+.spawn.*
+.builder_*
+.build_metadata*
+.stage_*
+PUBLISH_BLOCKED.md
