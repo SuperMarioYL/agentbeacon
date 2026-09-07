@@ -1,0 +1,22 @@
+{
+  "version": "0.1.0",
+  "scope": "Offline Detector execution with explicit synthetic observations. No browser page, webhook, IM message or account-usage cutoff is exercised.",
+  "inputs": [
+    {
+      "path": "examples/presentation_demo.ts",
+      "sha256": "66ce08efc525bd5b5623803dd7062c97c76cf27b47f9db52fb35321edc5ceb35"
+    }
+  ],
+  "steps": [
+    {
+      "command": "bun examples/presentation_demo.ts completed",
+      "output": "[\n  {\n    \"kind\": \"completed\",\n    \"taskId\": \"demo-task\",\n    \"durationMin\": 1,\n    \"summary\": \"The example is complete.\"\n  }\n]\n",
+      "exit_code": 0
+    },
+    {
+      "command": "bun examples/presentation_demo.ts loop",
+      "output": "[\n  {\n    \"kind\": \"loop_suspected\",\n    \"taskId\": \"demo-task\",\n    \"turnCount\": 3,\n    \"idleMin\": 0,\n    \"repeatedMsgHash\": \"c4b2ce0\"\n  }\n]\n",
+      "exit_code": 0
+    }
+  ]
+}

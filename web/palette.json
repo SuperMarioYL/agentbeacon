@@ -1,0 +1,38 @@
+{
+  "mode": "auto",
+  "id": "84e656-6ae785-dff6ac-e6f4ea6ab99c",
+  "identity": "https://github.com/supermarioyl/agentbeacon",
+  "primary": "#84e656",
+  "secondary": "#6ae785",
+  "highlight": "#dff6ac",
+  "dark": {
+    "bg": "#070c0d",
+    "panel": "#0e1717",
+    "code": "#0d1713",
+    "ink": "#f9fdee",
+    "muted": "#9eb9a8",
+    "line": "#223c1d",
+    "primary": "#84e656",
+    "secondary": "#6ae785",
+    "highlight": "#dff6ac",
+    "accent": "#84e656",
+    "buttonStart": "#4c8432",
+    "buttonEnd": "#3d854d",
+    "buttonText": "#ffffff"
+  },
+  "light": {
+    "bg": "#fbfef9",
+    "panel": "#f9fef7",
+    "code": "#f6fdf3",
+    "ink": "#192a1c",
+    "muted": "#5e7a6b",
+    "line": "#daf7cb",
+    "primary": "#4a8130",
+    "secondary": "#3c824b",
+    "highlight": "#6d7854",
+    "accent": "#4a8130",
+    "buttonStart": "#4c8432",
+    "buttonEnd": "#3d854d",
+    "buttonText": "#ffffff"
+  }
+}

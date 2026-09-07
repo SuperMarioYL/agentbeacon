@@ -1,0 +1,98 @@
+{
+  "name": "AgentBeacon",
+  "tagline": "Turn observed browser-run states into notification signals.",
+  "architecture": {
+    "title": "Observed browser state to notification routes",
+    "nodes": [
+      {
+        "title": "Content observer",
+        "detail": "DOM snapshot"
+      },
+      {
+        "title": "Detector",
+        "detail": "Typed completion / repeat signals"
+      },
+      {
+        "title": "Background worker",
+        "detail": "Timers and dispatch"
+      },
+      {
+        "title": "IM channels",
+        "detail": "Feishu / DingTalk / WeCom"
+      },
+      {
+        "title": "Local config",
+        "detail": "chrome.storage.local"
+      }
+    ],
+    "edges": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        1
+      ],
+      [
+        4,
+        2
+      ]
+    ]
+  },
+  "process": {
+    "title": "Run the detector without a browser or network",
+    "steps": [
+      {
+        "title": "Feed snapshots",
+        "detail": "Explicit synthetic observations"
+      },
+      {
+        "title": "Apply state machine",
+        "detail": "Streaming / idle or repeated text"
+      },
+      {
+        "title": "Read signal",
+        "detail": "completed or loop_suspected"
+      }
+    ],
+    "result": "Both offline scenarios emit their expected typed signal; no IM is contacted."
+  },
+  "integrations": {
+    "title": "Browser observations and configured channels",
+    "items": [
+      {
+        "title": "ChatGPT page",
+        "detail": "DOM selectors and streaming state"
+      },
+      {
+        "title": "Feishu webhook",
+        "detail": "Signed channel request"
+      },
+      {
+        "title": "DingTalk webhook",
+        "detail": "Signed channel request"
+      },
+      {
+        "title": "WeCom webhook",
+        "detail": "Group robot route"
+      },
+      {
+        "title": "Browser storage",
+        "detail": "Local channel configuration"
+      },
+      {
+        "title": "Chrome alarms",
+        "detail": "Elapsed-time warnings"
+      }
+    ]
+  }
+}

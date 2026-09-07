@@ -1,7 +1,7 @@
 {
   "name": "agentbeacon",
   "version": "0.1.0",
-  "description": "MV3 extension that detects ChatGPT agent completion + runaway loops and pushes signals to 微信/钉钉/飞书 IM bots, with a usage-cap tripwire.",
+  "description": "A browser extension that detects observed completion, repeated-message loops and elapsed-time warnings, with Feishu, DingTalk and WeCom webhook routes.",
   "private": true,
   "type": "module",
   "license": "MIT",
