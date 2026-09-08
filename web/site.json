@@ -104,6 +104,10 @@
           "alt": {
             "zh": "演示直接运行真实 Detector，输入固定的合成状态快照，分别得到 completed 和 loop_suspected。没有读取真实 ChatGPT 页面、发送 IM 或测试账户额度。",
             "en": "The demo runs the real Detector on fixed synthetic observations and emits completed and loop_suspected. It does not read a live ChatGPT page, send IM messages or inspect account usage."
+          },
+          "mobile": {
+            "light": "/assets/presentation/process-mobile-light.svg",
+            "dark": "/assets/presentation/process-mobile-dark.svg"
           }
         }
       },
@@ -122,6 +126,10 @@
           "alt": {
             "zh": "content.ts 通过 MutationObserver 采样页面，detector.ts 的状态机产生 AgentRunSignal；background.ts 管理 chrome.alarms 与分发。频道模块构造飞书、钉钉、企业微信请求，配置保存在 chrome.storage.local。",
             "en": "content.ts samples the page through MutationObserver. detector.ts emits AgentRunSignal values; background.ts manages chrome.alarms and dispatch. Channel modules build Feishu, DingTalk and WeCom requests, with configuration in chrome.storage.local."
+          },
+          "mobile": {
+            "light": "/assets/presentation/architecture-mobile-light.svg",
+            "dark": "/assets/presentation/architecture-mobile-dark.svg"
           }
         }
       },
@@ -140,6 +148,10 @@
           "alt": {
             "zh": "观察与分类在浏览器本地进行，通知通过用户配置的 webhook 发送。纯逻辑演示只覆盖分类器，频道送达属于另一项需要真实配置的验证。",
             "en": "Observation and classification run locally in the browser; notifications use user-configured webhooks. The pure-logic demo covers the classifier only. Channel delivery requires separate validation with real configuration."
+          },
+          "mobile": {
+            "light": "/assets/presentation/integrations-mobile-light.svg",
+            "dark": "/assets/presentation/integrations-mobile-dark.svg"
           }
         }
       }
