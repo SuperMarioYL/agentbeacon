@@ -59,6 +59,12 @@ export interface DetectorConfig {
   loopTurnDelta: number;
   /** Minutes of inactivity reported in the loop alert for context. */
   loopThresholdMin: number;
+  /** Seconds of sustained no-streaming quiet before "completed" fires. A
+   *  brief mid-run gap between turns must not ping. */
+  completedSettleSec: number;
+  /** Minimum seconds between two "completed" pings for the same task, so a
+   *  re-armed completion after a resumed run cannot spam. */
+  completedCooldownSec: number;
 }
 
 function round1(n: number): number {
@@ -74,8 +80,12 @@ function truncate(text: string, max: number): string {
  *  AgentRunSignals. Pure logic — no DOM, no chrome — so it is fully unit-tested.
  *
  *  Signals:
- *   - completed      once, on the streaming → idle transition once a final
- *                    turn is present. Represents "the agent finished a turn."
+ *   - completed      once per sustained quiet period: streaming stopped AND the
+ *                    DOM stayed quiet for completedSettleSec (the settle
+ *                    window) AND a final turn is present. A brief mid-run gap
+ *                    between turns does NOT fire; streaming resuming re-arms
+ *                    the latch so the true completion still pings, subject to
+ *                    the completedCooldownSec anti-spam window.
  *   - loop_suspected once, when a substantial message is repeated across turns
  *                    (after the turn-count floor). idle minutes are carried in
  *                    the signal for labelling. The cap tripwire (background)
@@ -89,6 +99,8 @@ export class Detector {
   private prevTurnCount = 0;
   private lastActivityMs: number;
   private streamingStartMs = 0;
+  private idleSinceMs: number | null = null;
+  private lastCompletedAtMs = 0;
   private readonly messageHashCounts = new Map<string, number>();
 
   constructor(
@@ -101,6 +113,17 @@ export class Detector {
 
   updateConfig(config: DetectorConfig): void {
     this.config = config;
+  }
+
+  /** True when streaming has stopped but the settle window has not yet
+   *  elapsed — the glue schedules one more observation to confirm. */
+  hasPendingCompletion(): boolean {
+    return this.idleSinceMs !== null && !this.completed;
+  }
+
+  /** The current settle window in ms, for the glue's confirm tick. */
+  settleWindowMs(): number {
+    return this.config.completedSettleSec * 1000;
   }
 
   observe(obs: AgentObservation): AgentRunSignal[] {
@@ -124,23 +147,43 @@ export class Detector {
         this.streamingStartMs = now;
       }
       this.lastActivityMs = now;
+      // streaming resumed — the previous quiet period was a mid-run gap, so
+      // re-arm the completion latch (the cooldown still limits ping spam).
+      this.idleSinceMs = null;
+      if (this.completed && this.pastCooldown(now)) {
+        this.completed = false;
+      }
     }
 
-    // completion — fire exactly once on the streaming → idle transition.
-    if (
-      !this.completed &&
-      this.wasStreaming &&
-      !obs.isStreaming &&
-      obs.hasTerminalArtifact
-    ) {
-      this.completed = true;
-      const since = this.streamingStartMs || this.runStartMs;
-      signals.push({
-        kind: "completed",
-        taskId: this.taskId,
-        durationMin: round1((now - since) / 60000),
-        summary: truncate(obs.lastMessageText, 140),
-      });
+    // completion — fire only after the DOM has stayed quiet for the settle
+    // window. The observation stream only advances on DOM mutations, so the
+    // glue must schedule a confirm tick via hasPendingCompletion().
+    if (!obs.isStreaming) {
+      if (this.wasStreaming) {
+        this.idleSinceMs = now; // streaming → idle transition starts the clock
+      }
+      if (
+        this.idleSinceMs !== null &&
+        !this.completed &&
+        obs.hasTerminalArtifact &&
+        now - this.idleSinceMs >= this.config.completedSettleSec * 1000
+      ) {
+        if (this.pastCooldown(now)) {
+          this.completed = true;
+          this.lastCompletedAtMs = now;
+          const since = this.streamingStartMs || this.runStartMs;
+          signals.push({
+            kind: "completed",
+            taskId: this.taskId,
+            durationMin: round1((now - since) / 60000),
+            summary: truncate(obs.lastMessageText, 140),
+          });
+        } else {
+          // a re-armed completion inside the cooldown window is consumed
+          // silently — the operator was already pinged moments ago
+          this.completed = true;
+        }
+      }
     }
 
     // loop — fire once when a substantial message repeats past the turn floor.
@@ -164,6 +207,13 @@ export class Detector {
 
     this.wasStreaming = obs.isStreaming;
     return signals;
+  }
+
+  private pastCooldown(now: number): boolean {
+    return (
+      this.lastCompletedAtMs === 0 ||
+      now - this.lastCompletedAtMs >= this.config.completedCooldownSec * 1000
+    );
   }
 
   private firstRepeatedHash(): string | undefined {

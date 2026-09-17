@@ -23,9 +23,19 @@ function deriveTaskId(): string {
 }
 
 const taskId = deriveTaskId();
-let detector = new Detector({ loopThresholdMin: 5, loopTurnDelta: 3 }, Date.now(), taskId);
+let detector = new Detector(
+  {
+    loopThresholdMin: 5,
+    loopTurnDelta: 3,
+    completedSettleSec: 60,
+    completedCooldownSec: 300,
+  },
+  Date.now(),
+  taskId,
+);
 let streamingSeen = false;
 let debounce: ReturnType<typeof setTimeout> | null = null;
+let confirmTick: ReturnType<typeof setTimeout> | null = null;
 
 function send(message: unknown): void {
   chrome.runtime.sendMessage(message).catch(() => {
@@ -42,15 +52,31 @@ function tick(): void {
   for (const signal of detector.observe(obs)) {
     send({ type: "signal", signal });
   }
+  // When streaming stops, the DOM usually goes quiet — no further mutations
+  // would ever confirm the settle window. Schedule the confirm observation
+  // ourselves so "completed" fires after sustained idle, not on the first gap.
+  if (confirmTick) clearTimeout(confirmTick);
+  if (detector.hasPendingCompletion()) {
+    confirmTick = setTimeout(
+      tick,
+      detector.settleWindowMs() + 250,
+    );
+  }
+}
+
+/** The detector-relevant slice of the config. */
+function detectorConfig(cfg: AgentBeaconConfig) {
+  return {
+    loopThresholdMin: cfg.loopThresholdMin,
+    loopTurnDelta: cfg.loopTurnDelta,
+    completedSettleSec: cfg.completedSettleSec,
+    completedCooldownSec: cfg.completedCooldownSec,
+  };
 }
 
 async function init(): Promise<void> {
   const cfg = await store.getConfig();
-  detector = new Detector(
-    { loopThresholdMin: cfg.loopThresholdMin, loopTurnDelta: cfg.loopTurnDelta },
-    Date.now(),
-    taskId,
-  );
+  detector = new Detector(detectorConfig(cfg), Date.now(), taskId);
 
   // Live-update thresholds if the user changes config in the popup.
   chrome.storage.onChanged.addListener((changes, area) => {
@@ -59,10 +85,7 @@ async function init(): Promise<void> {
     if (!change) return;
     const next = change.newValue as AgentBeaconConfig | undefined;
     if (next) {
-      detector.updateConfig({
-        loopThresholdMin: next.loopThresholdMin,
-        loopTurnDelta: next.loopTurnDelta,
-      });
+      detector.updateConfig(detectorConfig(next));
     }
   });
 

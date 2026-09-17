@@ -7,6 +7,10 @@ const form = document.getElementById("config-form") as HTMLFormElement;
 const status = document.getElementById("status") as HTMLParagraphElement;
 const testBtn = document.getElementById("test") as HTMLButtonElement;
 
+// The form has no inputs for the settle/cooldown windows — carry the loaded
+// values through so saving the form cannot wipe them back to defaults.
+let loaded: AgentBeaconConfig | undefined;
+
 const CHANNELS: ChannelName[] = ["feishu", "dingtalk", "wework"];
 
 function field(id: string): HTMLInputElement {
@@ -32,6 +36,8 @@ function readForm(): AgentBeaconConfig {
     capThresholdMin: Number(field("cap-threshold").value) || 0,
     loopThresholdMin: Number(field("loop-threshold").value) || 0,
     loopTurnDelta: Number(field("loop-turn-delta").value) || 0,
+    completedSettleSec: loaded?.completedSettleSec ?? 60,
+    completedCooldownSec: loaded?.completedCooldownSec ?? 300,
   };
 }
 
@@ -55,7 +61,8 @@ function flash(msg: string, ms = 2500): void {
 }
 
 async function init(): Promise<void> {
-  fillForm(await store.getConfig());
+  loaded = await store.getConfig();
+  fillForm(loaded);
 }
 
 form.addEventListener("submit", async (e) => {

@@ -14,6 +14,8 @@ export const DEFAULT_CONFIG: AgentBeaconConfig = {
   capThresholdMin: 240,
   loopThresholdMin: 5,
   loopTurnDelta: 3,
+  completedSettleSec: 60,
+  completedCooldownSec: 300,
 };
 
 export const CONFIG_KEY = "agentbeacon.config.v1";
@@ -31,6 +33,9 @@ function merge(stored: Partial<AgentBeaconConfig> | undefined): AgentBeaconConfi
     capThresholdMin: s.capThresholdMin ?? DEFAULT_CONFIG.capThresholdMin,
     loopThresholdMin: s.loopThresholdMin ?? DEFAULT_CONFIG.loopThresholdMin,
     loopTurnDelta: s.loopTurnDelta ?? DEFAULT_CONFIG.loopTurnDelta,
+    completedSettleSec: s.completedSettleSec ?? DEFAULT_CONFIG.completedSettleSec,
+    completedCooldownSec:
+      s.completedCooldownSec ?? DEFAULT_CONFIG.completedCooldownSec,
   };
 }
 

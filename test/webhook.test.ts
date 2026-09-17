@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { dispatchSignal, signalMessage, type FetchImpl } from "../src/lib/webhook";
+import {
+  conversationLink,
+  dispatchSignal,
+  signalMessage,
+  type FetchImpl,
+} from "../src/lib/webhook";
 import type { AgentBeaconConfig, AgentRunSignal } from "../src/types";
 
 function makeFetch(status: number): { impl: FetchImpl; calls: { url: string; body: string }[] } {
@@ -22,6 +27,8 @@ const cfg: AgentBeaconConfig = {
   capThresholdMin: 240,
   loopThresholdMin: 5,
   loopTurnDelta: 3,
+  completedSettleSec: 60,
+  completedCooldownSec: 300,
 };
 
 describe("signalMessage", () => {
@@ -51,6 +58,53 @@ describe("signalMessage", () => {
       thresholdMin: 240,
     };
     expect(signalMessage(cap)).toContain("240 min elapsed");
+  });
+});
+
+describe("conversationLink", () => {
+  const UUID = "3f1c2b9a-8d4e-4f2a-9c1b-7e6d5a4b3c2d";
+
+  it("builds the open-tab URL from a conversation-uuid taskId", () => {
+    expect(conversationLink(UUID)).toBe(`\nhttps://chatgpt.com/c/${UUID}`);
+  });
+
+  it("omits the link for the tab- path fallback", () => {
+    expect(conversationLink("tab-default")).toBe("");
+    expect(conversationLink("tab-abc123")).toBe("");
+  });
+
+  it("appends the link to loop, cap and completed alerts", () => {
+    const loop: AgentRunSignal = {
+      kind: "loop_suspected",
+      taskId: UUID,
+      turnCount: 5,
+      idleMin: 2,
+    };
+    expect(signalMessage(loop)).toContain(`https://chatgpt.com/c/${UUID}`);
+    const cap: AgentRunSignal = {
+      kind: "cap_warning",
+      taskId: UUID,
+      elapsedMin: 240,
+      thresholdMin: 240,
+    };
+    expect(signalMessage(cap)).toContain(`https://chatgpt.com/c/${UUID}`);
+    const done: AgentRunSignal = {
+      kind: "completed",
+      taskId: UUID,
+      durationMin: 43,
+      summary: "done",
+    };
+    expect(signalMessage(done)).toContain(`https://chatgpt.com/c/${UUID}`);
+  });
+
+  it("keeps the fallback taskId out of the alert link", () => {
+    const loop: AgentRunSignal = {
+      kind: "loop_suspected",
+      taskId: "tab-default",
+      turnCount: 5,
+      idleMin: 2,
+    };
+    expect(signalMessage(loop)).not.toContain("https://chatgpt.com/c/");
   });
 });
 
@@ -113,6 +167,8 @@ describe("dispatchSignal", () => {
       capThresholdMin: 240,
       loopThresholdMin: 5,
       loopTurnDelta: 3,
+      completedSettleSec: 60,
+      completedCooldownSec: 300,
     };
     const results = await dispatchSignal(
       { kind: "completed", taskId: "t", durationMin: 1, summary: "s" },

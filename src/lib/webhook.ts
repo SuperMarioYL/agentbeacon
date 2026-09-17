@@ -47,19 +47,30 @@ const CHANNEL_BUILDERS: Record<ChannelName, ChannelBuilder> = {
 
 const CHANNEL_ORDER: ChannelName[] = ["feishu", "dingtalk", "wework"];
 
+/** The open-tab link appended to alerts. taskId is the conversation uuid from
+ *  the URL (content.ts deriveTaskId); the `tab-` path fallback is not a real
+ *  conversation, so it gets no link. */
+export function conversationLink(taskId: string): string {
+  if (taskId.startsWith("tab-")) return "";
+  return /^[0-9a-f][0-9a-f-]{7,}$/i.test(taskId)
+    ? `\nhttps://chatgpt.com/c/${taskId}`
+    : "";
+}
+
 /** Human-readable alert text for a signal — the IM bot message body. */
 export function signalMessage(signal: AgentRunSignal): string {
+  const link = conversationLink(signal.taskId);
   switch (signal.kind) {
     case "completed":
-      return `✅ Agent completed (${signal.durationMin} min).\n${signal.summary}`;
+      return `✅ Agent completed (${signal.durationMin} min).\n${signal.summary}${link}`;
     case "loop_suspected": {
       const repeat = signal.repeatedMsgHash
         ? ` · repeated msg ${signal.repeatedMsgHash.slice(0, 8)}`
         : "";
-      return `⚠️ Loop suspected — cap at risk.\nTurns: ${signal.turnCount}, idle ${signal.idleMin} min${repeat}.\nOpen the tab to check.`;
+      return `⚠️ Loop suspected — cap at risk.\nTurns: ${signal.turnCount}, idle ${signal.idleMin} min${repeat}.\nOpen the tab to check:${link}`;
     }
     case "cap_warning":
-      return `⏱️ ${signal.elapsedMin} min elapsed — cap at risk (threshold ${signal.thresholdMin} min). Check your usage.`;
+      return `⏱️ ${signal.elapsedMin} min elapsed — cap at risk (threshold ${signal.thresholdMin} min). Check your usage.${link}`;
   }
 }
 

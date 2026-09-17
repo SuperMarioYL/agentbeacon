@@ -1,13 +1,17 @@
 import { RunRegistry } from "./lib/run-registry";
+import { RunStore } from "./lib/run-store";
 import { Store } from "./lib/store";
 import { dispatchSignal, signalMessage } from "./lib/webhook";
 import type { AgentRunSignal } from "./types";
 
 // MV3 service worker. Owns the cap-tripwire (chrome.alarms) and dispatches
 // signals from the content script to the configured IM channels. The run-state
-// decisions live in RunRegistry (pure, unit-tested); this file is the chrome glue.
+// decisions live in RunRegistry (pure, unit-tested); the records ALSO persist
+// to chrome.storage.session via RunStore because this worker is killed after
+// ~30s idle and cold-restarted by the very alarm that needs the state.
 
 const store = new Store();
+const runStore = new RunStore();
 const runs = new RunRegistry();
 const CAP_ALARM_PREFIX = "cap:";
 
@@ -16,6 +20,7 @@ async function handleSignal(signal: AgentRunSignal): Promise<void> {
   if (signal.kind === "completed") {
     // The run finished — no cap warning is needed; cancel the pending alarm.
     runs.markCompleted(signal.taskId);
+    await runStore.markCompleted(signal.taskId);
     await chrome.alarms.clear(CAP_ALARM_PREFIX + signal.taskId);
   }
   await dispatchSignal(signal, cfg);
@@ -27,7 +32,8 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
     const tabId = sender.tab?.id;
     void (async () => {
       const cfg = await store.getConfig();
-      runs.startRun(msg.taskId, Date.now(), tabId);
+      const rec = runs.startRun(msg.taskId, Date.now(), tabId);
+      await runStore.startRun(rec);
       await chrome.alarms.clear(CAP_ALARM_PREFIX + msg.taskId);
       if (cfg.capThresholdMin > 0) {
         chrome.alarms.create(CAP_ALARM_PREFIX + msg.taskId, {
@@ -47,6 +53,10 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (!alarm.name.startsWith(CAP_ALARM_PREFIX)) return;
   const taskId = alarm.name.slice(CAP_ALARM_PREFIX.length);
+  // This worker may have been cold-restarted by the alarm itself — rehydrate
+  // the persisted run record before evaluating, or the tripwire is a no-op.
+  const persisted = await runStore.get(taskId);
+  if (persisted) runs.hydrate(persisted);
   const cfg = await store.getConfig();
   const signal = runs.evaluateCapWarning(
     taskId,

@@ -21,6 +21,14 @@ export class RunRegistry {
     return rec;
   }
 
+  /** Seed a record persisted by an earlier service-worker incarnation, so the
+   *  in-memory decision logic can evaluate a run it never saw start. */
+  hydrate(rec: RunRecord): void {
+    if (!this.runs.has(rec.taskId)) {
+      this.runs.set(rec.taskId, rec);
+    }
+  }
+
   get(taskId: string): RunRecord | undefined {
     return this.runs.get(taskId);
   }

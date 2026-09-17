@@ -1,9 +1,13 @@
 {
   "manifest_version": 3,
   "name": "AgentBeacon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Detect ChatGPT agent completion + runaway loops; push signals to 微信/钉钉/飞书 IM bots; cap tripwire.",
-  "permissions": ["storage", "alarms", "runtime"],
+  "permissions": [
+    "storage",
+    "alarms",
+    "runtime"
+  ],
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://*.feishu.cn/*",
@@ -17,8 +21,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*"],
-      "js": ["src/content.ts"],
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "src/content.ts"
+      ],
       "run_at": "document_idle"
     }
   ],

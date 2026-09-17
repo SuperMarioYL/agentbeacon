@@ -40,6 +40,12 @@ export interface AgentBeaconConfig {
   loopThresholdMin: number;
   /** Turn count at which a stalled run is considered long enough to flag. */
   loopTurnDelta: number;
+  /** Seconds of sustained no-streaming quiet before "completed" fires — a
+   *  brief mid-run gap between turns must not ping. Default 60. */
+  completedSettleSec: number;
+  /** Minimum seconds between two "completed" pings for the same task, so a
+   *  re-armed completion after a resumed run cannot spam. Default 300. */
+  completedCooldownSec: number;
 }
 
 /** A built, signed, ready-to-send HTTP request to one IM bot webhook. */

@@ -1,6 +1,6 @@
 {
   "name": "agentbeacon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A browser extension that detects observed completion, repeated-message loops and elapsed-time warnings, with Feishu, DingTalk and WeCom webhook routes.",
   "private": true,
   "type": "module",
