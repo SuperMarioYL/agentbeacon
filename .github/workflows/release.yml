@@ -21,7 +21,16 @@ jobs:
           (cd dist && zip -r ../release/agentbeacon-chromium.zip .)
           (cd release && sha256sum agentbeacon-chromium.zip > checksums.txt)
           cat release/checksums.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: release-dist
-          path: release/*
+      - name: Attach artifacts to the release
+        # actions/upload-artifact only stores these in the run's artifact store
+        # (login-only, 90-day expiry), which is not the download a user looks for
+        # on the Release page. --clobber keeps this idempotent against
+        # publish_repo.sh, which uploads dist/* itself.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+                 --title "${GITHUB_REPOSITORY##*/} $GITHUB_REF_NAME" --notes "Release $GITHUB_REF_NAME"
+          gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber \
+            release/agentbeacon-chromium.zip release/checksums.txt

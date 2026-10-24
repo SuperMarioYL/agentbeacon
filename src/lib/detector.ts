@@ -57,8 +57,6 @@ export function hashMessage(text: string): string {
 export interface DetectorConfig {
   /** Minimum total turns before a loop is even considered (false-positive floor). */
   loopTurnDelta: number;
-  /** Minutes of inactivity reported in the loop alert for context. */
-  loopThresholdMin: number;
   /** Seconds of sustained no-streaming quiet before "completed" fires. A
    *  brief mid-run gap between turns must not ping. */
   completedSettleSec: number;

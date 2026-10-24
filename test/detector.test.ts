@@ -82,7 +82,6 @@ describe("extractObservation", () => {
 describe("Detector — completion", () => {
   const CFG = {
     loopTurnDelta: 2,
-    loopThresholdMin: 5,
     completedSettleSec: 60,
     completedCooldownSec: 300,
   };
@@ -169,7 +168,7 @@ describe("Detector — completion", () => {
 
 describe("Detector — loop", () => {
   it("flags loop_suspected on a repeated substantial message", () => {
-    const d = new Detector({ loopTurnDelta: 2, loopThresholdMin: 5, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
+    const d = new Detector({ loopTurnDelta: 2, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
     // turn 1 streams in (distinct, new content)
     d.observe(obs([LONG_A], { streaming: true, now: 1000 }));
     // turn 2 repeats turn 1 verbatim while still streaming -> loop
@@ -184,7 +183,7 @@ describe("Detector — loop", () => {
   });
 
   it("does not flag a loop on short repeated acknowledgements", () => {
-    const d = new Detector({ loopTurnDelta: 2, loopThresholdMin: 5, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
+    const d = new Detector({ loopTurnDelta: 2, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
     d.observe(obs(["ok"], { streaming: true, now: 1000 }));
     d.observe(obs(["ok"], { streaming: false, now: 2000 }));
     const s = d.observe(obs(["ok", "ok"], { streaming: true, now: 3000 }));
@@ -192,7 +191,7 @@ describe("Detector — loop", () => {
   });
 
   it("respects the turn-count floor before flagging", () => {
-    const d = new Detector({ loopTurnDelta: 3, loopThresholdMin: 5, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
+    const d = new Detector({ loopTurnDelta: 3, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
     d.observe(obs([LONG_A], { streaming: true, now: 1000 }));
     // 2 turns but floor is 3 -> not yet
     const early = d.observe(obs([LONG_A, LONG_A], { streaming: true, now: 2000 }));
@@ -205,7 +204,7 @@ describe("Detector — loop", () => {
   });
 
   it("fires a loop only once total", () => {
-    const d = new Detector({ loopTurnDelta: 2, loopThresholdMin: 5, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
+    const d = new Detector({ loopTurnDelta: 2, completedSettleSec: 60, completedCooldownSec: 300 }, 0, "t1");
     d.observe(obs([LONG_A], { streaming: true, now: 1000 }));
     d.observe(obs([LONG_A, LONG_A], { streaming: true, now: 2000 }));
     const again = d.observe(

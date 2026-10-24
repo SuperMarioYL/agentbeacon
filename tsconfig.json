@@ -20,5 +20,5 @@
     "useDefineForClassFields": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "test", "vite.config.ts", "vitest.config.ts"]
+  "include": ["src", "test", "examples", "vite.config.ts", "vitest.config.ts"]
 }

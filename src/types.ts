@@ -36,8 +36,6 @@ export interface AgentBeaconConfig {
   wework: ChannelConfig;
   /** Minutes after run start before a cap_warning fires. Default 240 (4h). */
   capThresholdMin: number;
-  /** Minutes of inactivity before a non-terminating run is flagged (idle path). */
-  loopThresholdMin: number;
   /** Turn count at which a stalled run is considered long enough to flag. */
   loopTurnDelta: number;
   /** Seconds of sustained no-streaming quiet before "completed" fires — a
@@ -61,4 +59,7 @@ export interface DispatchResult {
   ok: boolean;
   status: number;
   body: string;
+  /** Why a channel rejected the message, when the platform explained it (a
+   *  bad signature, an expired token, a rate limit). */
+  error?: string;
 }

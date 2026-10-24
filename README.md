@@ -9,7 +9,7 @@
 
 **观察 ChatGPT 标签页的完成与重复消息信号，通过已配置的 IM webhook 发出提醒。**
 
-`v0.1.0` · `Node.js 22+; Bun for demo` · [MIT](LICENSE)
+`v0.3.0` · `Node.js 22+; Bun for demo` · [MIT](LICENSE)
 
 [Website](https://agentbeacon.lei6393.com) · [Demo record](docs/demo-results.json)
 
@@ -55,6 +55,8 @@ bun examples/presentation_demo.ts loop
 ## 使用
 
 扩展加载后，在 popup 填写 webhook URL、可选 secret 与启用开关。完成提醒每个 Detector 生命周期只发送一次；循环提醒要求至少达到轮数下限，且长度不少于 60 字符的消息重复出现。请用你自己的浏览器和测试频道验证当前 DOM 适配。
+
+「发送测试 ping」同时校验 HTTP 状态与机器人返回的业务码：HTTP 200 但返回非零 code/errcode（签名错误、token 过期、被限流）会记为失败并显示平台给出的原因，不再误报成功。
 
 ## 实际 Demo
 
@@ -113,7 +115,7 @@ $ bun examples/presentation_demo.ts loop
 
 ## 配置
 
-默认 capThresholdMin=240、loopTurnDelta=3、loopThresholdMin=5，频道均关闭。配置键为 agentbeacon.config.v1。cap_warning 是按运行时间触发的提醒，不读取真实用量，也不停止服务端任务或执行额度熔断。
+默认 capThresholdMin=240、loopTurnDelta=3，频道均关闭。配置键为 agentbeacon.config.v1。cap_warning 是按运行时间触发的提醒，不读取真实用量，也不停止服务端任务或执行额度熔断。
 
 ## 路线图与范围
 

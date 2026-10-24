@@ -34,7 +34,6 @@ function readForm(): AgentBeaconConfig {
     dingtalk: channels.dingtalk,
     wework: channels.wework,
     capThresholdMin: Number(field("cap-threshold").value) || 0,
-    loopThresholdMin: Number(field("loop-threshold").value) || 0,
     loopTurnDelta: Number(field("loop-turn-delta").value) || 0,
     completedSettleSec: loaded?.completedSettleSec ?? 60,
     completedCooldownSec: loaded?.completedCooldownSec ?? 300,
@@ -51,7 +50,6 @@ function fillForm(cfg: AgentBeaconConfig): void {
     if (sec) sec.value = cfg[c].secret ?? "";
   }
   field("cap-threshold").value = String(cfg.capThresholdMin);
-  field("loop-threshold").value = String(cfg.loopThresholdMin);
   field("loop-turn-delta").value = String(cfg.loopTurnDelta);
 }
 
@@ -85,8 +83,18 @@ testBtn.addEventListener("click", async () => {
     cfg,
   );
   const ok = results.filter((r) => r.ok).length;
+  const failed = results.find((r) => !r.ok);
   if (results.length === 0) {
     flash("未启用任何通道，请填写 URL 并勾选启用。");
+  } else if (failed) {
+    // A 200 with a rejected payload counts as a failure now, so show the
+    // platform's own reason — a bare count would not tell the user what to fix.
+    flash(
+      `测试发送：${ok}/${results.length} 成功 · ${failed.channel}: ${
+        failed.error ?? failed.body.slice(0, 80)
+      }`,
+      6000,
+    );
   } else {
     flash(`测试发送：${ok}/${results.length} 成功`, 4000);
   }

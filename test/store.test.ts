@@ -47,7 +47,6 @@ describe("Store", () => {
     const cfg = await store.getConfig();
     expect(cfg.capThresholdMin).toBe(120);
     expect(cfg.loopTurnDelta).toBe(7);
-    expect(cfg.loopThresholdMin).toBe(DEFAULT_CONFIG.loopThresholdMin);
     expect(cfg.feishu.enabled).toBe(false);
   });
 });

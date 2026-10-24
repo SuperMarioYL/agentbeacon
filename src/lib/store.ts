@@ -12,7 +12,6 @@ export const DEFAULT_CONFIG: AgentBeaconConfig = {
   dingtalk: { webhookUrl: "", enabled: false },
   wework: { webhookUrl: "", enabled: false },
   capThresholdMin: 240,
-  loopThresholdMin: 5,
   loopTurnDelta: 3,
   completedSettleSec: 60,
   completedCooldownSec: 300,
@@ -31,7 +30,6 @@ function merge(stored: Partial<AgentBeaconConfig> | undefined): AgentBeaconConfi
     dingtalk: channel("dingtalk"),
     wework: channel("wework"),
     capThresholdMin: s.capThresholdMin ?? DEFAULT_CONFIG.capThresholdMin,
-    loopThresholdMin: s.loopThresholdMin ?? DEFAULT_CONFIG.loopThresholdMin,
     loopTurnDelta: s.loopTurnDelta ?? DEFAULT_CONFIG.loopTurnDelta,
     completedSettleSec: s.completedSettleSec ?? DEFAULT_CONFIG.completedSettleSec,
     completedCooldownSec:

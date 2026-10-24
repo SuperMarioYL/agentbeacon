@@ -9,7 +9,7 @@
 
 **Observe completion and repeated-message signals in a ChatGPT tab and route alerts through configured IM webhooks.**
 
-`v0.1.0` · `Node.js 22+; Bun for demo` · [MIT](LICENSE)
+`v0.3.0` · `Node.js 22+; Bun for demo` · [MIT](LICENSE)
 
 [Website](https://agentbeacon.lei6393.com) · [Demo record](docs/demo-results.json)
 
@@ -55,6 +55,8 @@ The complete observations and state transitions are in [examples/presentation_de
 ## Usage
 
 After loading the extension, configure webhook URLs, optional secrets and enable switches in the popup. Completion fires once per Detector lifecycle. A loop signal requires the turn-count floor and repetition of a message at least 60 characters long. Validate current DOM compatibility in your own browser and test channel.
+
+Send test ping checks both the HTTP status and the bot's own status code: HTTP 200 with a non-zero code/errcode (a bad signature, an expired token, a rate limit) now reports a failure together with the platform's reason instead of a false success.
 
 ## Recorded demo
 
@@ -113,7 +115,7 @@ Observation and classification run locally in the browser; notifications use use
 
 ## Configuration
 
-Defaults are capThresholdMin=240, loopTurnDelta=3 and loopThresholdMin=5; all channels start disabled. Configuration uses agentbeacon.config.v1. cap_warning is an elapsed-time alert: it does not read actual usage, stop the server-side task or enforce an account quota.
+Defaults are capThresholdMin=240 and loopTurnDelta=3; all channels start disabled. Configuration uses agentbeacon.config.v1. cap_warning is an elapsed-time alert: it does not read actual usage, stop the server-side task or enforce an account quota.
 
 ## Roadmap and scope
 

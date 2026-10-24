@@ -25,7 +25,6 @@ function deriveTaskId(): string {
 const taskId = deriveTaskId();
 let detector = new Detector(
   {
-    loopThresholdMin: 5,
     loopTurnDelta: 3,
     completedSettleSec: 60,
     completedCooldownSec: 300,
@@ -67,7 +66,6 @@ function tick(): void {
 /** The detector-relevant slice of the config. */
 function detectorConfig(cfg: AgentBeaconConfig) {
   return {
-    loopThresholdMin: cfg.loopThresholdMin,
     loopTurnDelta: cfg.loopTurnDelta,
     completedSettleSec: cfg.completedSettleSec,
     completedCooldownSec: cfg.completedCooldownSec,

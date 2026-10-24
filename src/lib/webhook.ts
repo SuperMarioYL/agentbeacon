@@ -8,6 +8,7 @@ import type {
 import { buildFeishuRequest } from "./channels/feishu";
 import { buildDingtalkRequest } from "./channels/dingtalk";
 import { buildWeworkRequest } from "./channels/wework";
+import { parseChannelAck } from "./channels/ack";
 
 export interface ChannelRequestInit {
   method: string;
@@ -100,11 +101,16 @@ export async function dispatchSignal(
         body: req.body,
       });
       const body = await res.text();
+      // A 2xx only means the request was accepted: the platform reports a
+      // rejected message (bad sign, expired token, rate limit) as HTTP 200 with
+      // a non-zero code in the body, so both verdicts must agree.
+      const ack = parseChannelAck(name, body);
       results.push({
         channel: name,
-        ok: res.status >= 200 && res.status < 300,
+        ok: res.status >= 200 && res.status < 300 && ack.ok,
         status: res.status,
         body,
+        error: ack.error,
       });
     } catch (err) {
       results.push({

@@ -7,14 +7,17 @@ import {
 } from "../src/lib/webhook";
 import type { AgentBeaconConfig, AgentRunSignal } from "../src/types";
 
-function makeFetch(status: number): { impl: FetchImpl; calls: { url: string; body: string }[] } {
+function makeFetch(
+  status: number,
+  body = '{"code":0}',
+): { impl: FetchImpl; calls: { url: string; body: string }[] } {
   const calls: { url: string; body: string }[] = [];
   const impl: FetchImpl = async (url, init) => {
     calls.push({ url, body: init.body });
     return {
       status,
       ok: status >= 200 && status < 300,
-      text: async () => `{"errcode":0}`,
+      text: async () => body,
     };
   };
   return { impl, calls };
@@ -25,7 +28,6 @@ const cfg: AgentBeaconConfig = {
   dingtalk: { webhookUrl: "https://d", enabled: false },
   wework: { webhookUrl: "", enabled: true },
   capThresholdMin: 240,
-  loopThresholdMin: 5,
   loopTurnDelta: 3,
   completedSettleSec: 60,
   completedCooldownSec: 300,
@@ -143,6 +145,39 @@ describe("dispatchSignal", () => {
     expect(results[0].status).toBe(500);
   });
 
+  it("reports a delivery the platform rejected inside a 200 body as a failure", async () => {
+    // 钉钉 answers a bad signature with HTTP 200 + errcode 310000, so the status
+    // alone would call this a successful ping.
+    const { impl } = makeFetch(200, '{"errcode":310000,"errmsg":"sign not match"}');
+    const dingtalkOnly: AgentBeaconConfig = {
+      ...cfg,
+      feishu: { webhookUrl: "", enabled: false },
+      dingtalk: { webhookUrl: "https://d", secret: "S", enabled: true },
+    };
+    const results = await dispatchSignal(
+      { kind: "completed", taskId: "t", durationMin: 1, summary: "s" },
+      dingtalkOnly,
+      impl,
+      1,
+    );
+    expect(results[0].channel).toBe("dingtalk");
+    expect(results[0].status).toBe(200);
+    expect(results[0].ok).toBe(false);
+    expect(results[0].error).toBe("sign not match");
+  });
+
+  it("keeps a delivered message ok when the body carries the platform's zero code", async () => {
+    const { impl } = makeFetch(200, '{"code":0,"msg":"success"}');
+    const results = await dispatchSignal(
+      { kind: "completed", taskId: "t", durationMin: 1, summary: "s" },
+      cfg,
+      impl,
+      1,
+    );
+    expect(results[0].ok).toBe(true);
+    expect(results[0].error).toBeUndefined();
+  });
+
   it("captures a thrown fetch as a failed result", async () => {
     const impl: FetchImpl = async () => {
       throw new Error("network down");
@@ -165,7 +200,6 @@ describe("dispatchSignal", () => {
       dingtalk: { webhookUrl: "https://d", enabled: false },
       wework: { webhookUrl: "https://w", enabled: false },
       capThresholdMin: 240,
-      loopThresholdMin: 5,
       loopTurnDelta: 3,
       completedSettleSec: 60,
       completedCooldownSec: 300,
