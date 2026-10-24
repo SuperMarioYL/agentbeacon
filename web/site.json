@@ -72,8 +72,8 @@
         "en": "Route signals to channels"
       },
       "body": {
-        "zh": "分别配置三个 IM webhook 及其启用状态。",
-        "en": "Configure each of the three IM webhooks and enable states."
+        "zh": "分别配置三个 IM webhook 及其启用状态；测试 ping 同时校验 HTTP 状态与机器人返回的业务码，被拒收时给出平台返回的原因。",
+        "en": "Configure each of the three IM webhooks and enable states; the test ping also checks the bot's own status code, so a rejected message reports the platform's reason."
       }
     }
   ],
